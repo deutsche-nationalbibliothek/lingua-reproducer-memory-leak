@@ -34,8 +34,7 @@
         <dependency>
             <groupId>com.github.pemistahl</groupId>
             <artifactId>lingua</artifactId>
-            <!-- version with memory leak. leak is fixed in 1.1.1 , see branch fix-for-memory-leak -->
-            <version>1.1.0</version>
+            <version>1.1.1</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

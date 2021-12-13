@@ -41,7 +41,7 @@ public class LanguageDetectionServlet extends HttpServlet {
     @Override
     public void destroy() {
         super.destroy();
-        // could do manual cleanup here if there was a method to call
+        detectorForAllLanguages.destroy();
         LOGGER.info("Destroying servlet");
     }
 
