@@ -1,11 +1,9 @@
-# lingua-reproducer-memory-leak
-Reproducer for a memory leak in Lingua 1.1.0 when using it from a web application
+# Reproducer for a memory leak in Lingua 1.1.0 (fixed in 1.1.1)
+Reproducer for a memory leak in Lingua 1.1.0 when using it from a web application. The memory leak is fixed in Lingua 1.1.1: web applications can call ``destroy()`` on the ``LanguageDetector`` to clean up when the application shuts down.
 
 # Building
 
-The application is built using Maven. In order to use the newest snapshot of Lingua, it needs to be pulled from a Maven repository. It's possible to install the snapshot into the local repository by using
-
-`mvn install:install-file -Dfile=${pathToLinguaRepo}/build/libs/lingua-1.2.0-SNAPSHOT-with-dependencies.jar -DgroupId=com.github.pemistahl -DartifactId=lingua -Dversion=1.2.0-SNAPSHOT -Dpackaging=jar`
+The application is built using Maven.
 
 # Reproducing the problem
 
@@ -17,7 +15,7 @@ To reproduce the problem, do the following:
 
 # Possible causes
 
-In order for a web application to be shut down properly, the threads and associated resources created by the web appllication must be released when the application is undeployed. This does not happen for the example application. As discussed in [Lingua #110](https://github.com/pemistahl/lingua/issues/110), the likely culprit are the Kotlin coroutines.
+In order for a web application to be shut down properly, the threads and associated resources created by the web appllication must be released when the application is undeployed. This does not happen for the example application. As discussed in [Lingua #116](https://github.com/pemistahl/lingua/issues/116), the likely culprit are the Kotlin coroutines.
 
 If you take a heap dump using [Eclipse Memory Analyzer](https://www.eclipse.org/mat/) on Wildfly 24 after 1 or 2 redeploys, and then run a leak suspects report, you will see that instances of the ModuleClassLoader still hang around. Each instance retains about 2,2GB heap each. The Leak Suspects report of Eclipse Memory Analyzer points to the threads created by Kotlin to handle the coroutines.
 
@@ -34,3 +32,9 @@ DefaultDispatcher-worker-2
 
 Classes related to coroutines still present in the dump (seem to be similar to those from [Lingua #110](https://github.com/pemistahl/lingua/issues/110)):
 `shadow.kotlinx.coroutines.scheduling.CoroutineScheduler$WorkerState`, `shadow.kotlinx.coroutines.scheduling.WorkQueue`, `shadow.kotlinx.coroutines.scheduling.CoroutineScheduler$WorkerState`
+
+# Installing locally built versions of Lingua
+
+In order to use a locally built snapshot of Lingua, it needs to be pulled from a Maven repository. It's possible to install the snapshot into the local repository by using
+
+`mvn install:install-file -Dfile=${pathToLinguaRepo}/build/libs/${linguaJar} -DgroupId=com.github.pemistahl -DartifactId=lingua -Dversion=${linguaVersion} -Dpackaging=jar`
